@@ -12,11 +12,6 @@
 #define ESCAPE 27 
 #define SPACE 32
 
-#define EMPTY 0 
-#define CLOUD 1
-#define SNOW 2
-#define MAP 3
-
 #include <iostream>
 #include <windows.h>
 #include <conio.h>
@@ -24,6 +19,13 @@
 #include <io.h>
 
 std::string ms;
+
+const int EMPTY = 0, CLOUD = 1, SNOW = 2, MAP = 3;
+
+const char EMPTY_symbol = ' ',//Пустота
+		   CLOUD_symbol = '_',//Туча
+		   SNOW_symbol = '*',//Снежинка
+		   MAP_symbol = 'X';//Карта
 
 struct T_List {//Структура списка
 	int col, line;
@@ -60,34 +62,9 @@ bool OpenMap(char** NameMap, int& Size_Map, bool& end);//Открываем ка
 void MoveCloud(T_List* List, T_List*& Cloud, char c);//Передвижение тучи
 void MoveSnowflake(T_List* List, T_List* Cloud);//Падение снежинок 
 T_List* FallSnowflake(T_List* List, T_List* Snow);//Падение снежинок вниз
-T_List* LogicSnowflake(T_List* List, T_List* Snow);//Снежинка скатывается влево/вправо
-
-void FallRight(T_List* List, T_List*& Curr) {//Скатывается вправо
-	if (Curr->Next->id == EMPTY && CheckDownRight(Curr) && GoDown(Curr)->id == SNOW) {
-		if (Curr->line != HIGH_CONSOLE) {
-			if (Curr->id != CLOUD) {
-				Curr->id = EMPTY;
-			}
-			PrintNewItem(List, Curr);
-			Curr = GoDown(Curr->Next);
-			Curr->id = SNOW;
-		}
-	}
-}
-
-void FallLeft(T_List* List, T_List*& Curr) {//Скатывается влево
-	if (Curr->Prev->id == EMPTY && CheckDownLeft(Curr) && GoDown(Curr)->id == SNOW) {
-		if (Curr->line != HIGH_CONSOLE) {
-			if (Curr->id != CLOUD) {
-				Curr->id = EMPTY;
-			}
-			PrintNewItem(List, Curr);
-			Curr = GoDown(Curr->Prev);
-			Curr->id = SNOW;
-		}
-	}
-}
-
+T_List* LogicSnowflake(T_List* List, T_List* Snow);//Логика снежинок
+void FallRight(T_List* List, T_List*& Curr); //Скатывается вправо
+void FallLeft(T_List* List, T_List*& Curr);//Скатывается влево
 
 int main()
 {
@@ -144,7 +121,7 @@ void Gaming() {//Логика игры       ///// сделать выбор к�
 	ms = "Введите название файла (карты)";
 	gotoxy((WIDTH_CONSOLE - 1 - ms.length()) / 2, 3);
 	std::cout << ms;
-	gotoxy((WIDTH_CONSOLE - 1 - ms.length()) / 2, 4);
+	gotoxy((WIDTH_CONSOLE - 1 - ms.length()) / 2, 5);
 	ms = "Карта: ";
 	std::cout << ms;
 	std::cin >> FileName;
@@ -154,6 +131,8 @@ void Gaming() {//Логика игры       ///// сделать выбор к�
 	T_List* Cloud = List;
 	if (List) {
 		Cloud->id = CLOUD;
+		gotoxy(0, 0);
+		std::cout << CLOUD_symbol;
 		PrintList(List);
 		while (!end) {
 			c = _getch();
@@ -178,12 +157,17 @@ void PreviewMap() {//Предпросмотр карт
 		bool f = OpenMap(NameMap, Size_Map, end);
 		if (f) {
 			T_List* List = Read_from_file(NameMap[selected]);
-			PrintList(List);
-
+			gotoxy(0, 0);
+			for (int i = 0; i < WIDTH_CONSOLE; ++i) {
+				std::cout << " ";
+			}
 			ms = "Название файла: ";
 			ms = ms + NameMap[selected] + "   (Пробел - удалить карту)";
 			gotoxy((WIDTH_CONSOLE - 1 - ms.length()) / 2, 0);
 			std::cout << ms;
+
+			PrintList(List);
+
 			gotoxy(WIDTH_CONSOLE - 1, HIGH_CONSOLE - 1);
 
 			//работа с клавиатурой
@@ -210,7 +194,6 @@ void PreviewMap() {//Предпросмотр карт
 			}
 			delete[] NameMap;
 			DeleteList(List);
-			//system("cls");
 		}
 	}
 }
@@ -249,7 +232,7 @@ T_List* Read_from_file(std::string FileName) {
 	File.open(FileName);  // Открыли файл
 	if (!File.is_open()) {  //  Проверили удалось ли открыть файл
 		ms = "Открыть файл не удалось!";
-		gotoxy((WIDTH_CONSOLE - 1 - ms.length()) / 2, 6);
+		gotoxy((WIDTH_CONSOLE - 1 - ms.length()) / 2, 7);
 		std::cout << ms;
 		gotoxy(WIDTH_CONSOLE - 1, HIGH_CONSOLE - 1);
 		_getch();
@@ -362,7 +345,7 @@ void CreateMap() {//Создание карты
 			if (empty == 1) {
 				Cursor->id = EMPTY;
 				gotoxy(Cursor->col - 1, Cursor->line - 1);
-				std::cout << "X";
+				std::cout << MAP_symbol;
 			}
 			else Cursor->id = MAP;
 		}
@@ -473,32 +456,10 @@ T_List* LogicSnowflake(T_List* List, T_List* Snow) {//Логика снежин�
 	T_List* Curr = Snow;
 	T_List* Temp = Curr;
 	srand(time(0));
-	int r = rand() % 2;
+	int random = rand() % 2;
 
 	if (Curr->Next) {
-		//if (Curr->Next->id == EMPTY && CheckDownRight(Curr) && GoDown(Curr)->id == SNOW) {//Скатывается вправо
-		//	if (Curr->line != HIGH_CONSOLE) {
-		//		if (Curr->id != CLOUD) {
-		//			Curr->id = EMPTY;
-		//		}
-		//		PrintNewItem(List, Curr);
-		//		Curr = GoDown(Curr->Next);
-		//		Curr->id = SNOW;
-		//	}
-		//}
-		//else {
-		//	if (Curr->Prev->id == EMPTY && CheckDownLeft(Curr) && GoDown(Curr)->id == SNOW) {//Скатывается влево
-		//		if (Curr->line != HIGH_CONSOLE) {
-		//			if (Curr->id != CLOUD) {
-		//				Curr->id = EMPTY;
-		//			}
-		//			PrintNewItem(List, Curr);
-		//			Curr = GoDown(Curr->Prev);
-		//			Curr->id = SNOW;
-		//		}
-		//	}
-		//}
-		if (r) {
+		if (random) {
 			FallRight(List, Curr);
 			FallLeft(List, Curr);
 		}
@@ -510,6 +471,32 @@ T_List* LogicSnowflake(T_List* List, T_List* Snow) {//Логика снежин�
 		Sleep(TIME);
 	}
 	return Curr;
+}
+
+void FallRight(T_List* List, T_List*& Curr) {//Скатывается вправо
+	if (Curr->Next->id == EMPTY && CheckDownRight(Curr) && GoDown(Curr)->id == SNOW) {
+		if (Curr->line != HIGH_CONSOLE) {
+			if (Curr->id != CLOUD) {
+				Curr->id = EMPTY;
+			}
+			PrintNewItem(List, Curr);
+			Curr = GoDown(Curr->Next);
+			Curr->id = SNOW;
+		}
+	}
+}
+
+void FallLeft(T_List* List, T_List*& Curr) {//Скатывается влево
+	if (Curr->Prev->id == EMPTY && CheckDownLeft(Curr) && GoDown(Curr)->id == SNOW) {
+		if (Curr->line != HIGH_CONSOLE) {
+			if (Curr->id != CLOUD) {
+				Curr->id = EMPTY;
+			}
+			PrintNewItem(List, Curr);
+			Curr = GoDown(Curr->Prev);
+			Curr->id = SNOW;
+		}
+	}
 }
 
 void PrintMenuPoint(int selected, int N, std::string MenuPoint) {
@@ -568,16 +555,16 @@ void Converting_from_id(T_List* List) {//Конвертация в символ
 	while (Curr) {
 		switch (Curr->id) {
 		case EMPTY:
-			Curr->point = ' ';//Пустота
+			Curr->point = EMPTY_symbol;//Пустота
 			break;
 		case CLOUD:
-			Curr->point = '_';//Туча
+			Curr->point = CLOUD_symbol;//Туча
 			break;
 		case SNOW:
-			Curr->point = '*';//Снежинка
+			Curr->point = SNOW_symbol;//Снежинка
 			break;
 		case MAP:
-			Curr->point = 'X';//Карта
+			Curr->point = MAP_symbol;//Карта
 			break;
 		}
 		Curr = Curr->Next;
@@ -586,11 +573,13 @@ void Converting_from_id(T_List* List) {//Конвертация в символ
 
 void PrintList(T_List* List) {//Вывод списка
 	T_List* Curr = List;
-	system("cls");
 	Converting_from_id(List);
+	gotoxy(0, 1);
 	while (Curr) {
-		std::cout << Curr->point;
-		if (Curr->col == WIDTH_CONSOLE && Curr->line != HIGH_CONSOLE) {
+		if (Curr->line != 1) {
+			std::cout << Curr->point;
+		}
+		if (Curr->col == WIDTH_CONSOLE && Curr->line != HIGH_CONSOLE && Curr->line != 1) {
 			std::cout << std::endl;
 		}
 		Curr = Curr->Next;
