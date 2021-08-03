@@ -114,7 +114,7 @@ void Start() {//Старт игры
 	}
 }
 
-void Gaming() {//Логика игры       ///// сделать выбор карт
+void Gaming() {//Логика игры 
 	char c;
 	bool end = false;
 	std::string FileName = "";
