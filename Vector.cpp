@@ -1,6 +1,4 @@
 ﻿#include <iostream>
-#include <vector>
-#include <iterator>
 
 template<class T>
 class vector {
