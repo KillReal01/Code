@@ -244,8 +244,7 @@ matrix<T> matrix<T>::operator * (const matrix& other) {
 	}
 	else {
 		std::cout << "We can not multiply!\n";
-		matrix<T> tmp;
-		return tmp;
+		return 0;
 	}
 }
 
@@ -271,8 +270,7 @@ matrix<T> matrix<T>::operator ^ (const int value) {
 	}
 	else {
 		std::cout << "We can not raise to the power!\n";
-		matrix<T> tmp;
-		return tmp;
+		return 0;
 	}
 }
 
@@ -281,7 +279,6 @@ void matrix<T>::swap(matrix& other) {
 	matrix<T> tmp(*this);
 	*this = other;
 	other = tmp;
-	
 }
 
 
