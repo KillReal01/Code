@@ -9,10 +9,10 @@ public:
 	vector();
 	vector(int size);
 	vector(int size, T value);
-	~vector();//деструктор
+	~vector();
 	vector(vector& other);
 
-	int size();//размер вектора
+	int size();
 	void resize(int size);
 	void resize(int size, T value);
 	bool empty();
