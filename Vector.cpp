@@ -3,7 +3,8 @@
 template<class T>
 class vector {
 private:
-	int size_vector, * data;
+	int size_vector;
+	T* data;
 public:
 	vector();
 	vector(int size);
