@@ -5,11 +5,11 @@ class vector {
 private:
 	int size_vector, * data;
 public:
-	vector();//конструктор
-	vector(int size);//конструктор
-	vector(int size, T value);//конструктор
+	vector();
+	vector(int size);
+	vector(int size, T value);
 	~vector();//деструктор
-	vector(vector& other);//конструктор копии
+	vector(vector& other);
 
 	int size();//размер вектора
 	void resize(int size);
@@ -31,7 +31,6 @@ public:
 
 	T* begin();
 	T* end();
-	unsigned char size_type();
 	void printVector();
 };
 
@@ -46,7 +45,7 @@ int main() {
 template<class T>
 vector<T>::vector() {
 	this->size_vector = 0;
-	this->data = 0;
+	this->data = nullptr;
 }
 
 template<class T>
@@ -70,14 +69,15 @@ vector<T>::vector(int size, T value) {
 template<class T>
 vector<T>::~vector() {
 	delete[] this->data;
-	this->size_vector = 0;
 }
 
 template<class T>
 vector<T>::vector(vector& other) {
 	this->data = new T[other.size_vector];
+	for (int i = 0; i < other.size_vector; i++) {
+		data[i] = other.data[i];
+	}
 	this->size_vector = other.size_vector;
-	memcpy(this->data, other.data, other.size_vector * sizeof(T));
 }
 
 template<class T>
@@ -92,10 +92,14 @@ T& vector<T>::operator[] (const int index) {
 
 template<class T>
 vector<T>& vector<T>::operator = (const vector& other) {
-	delete[] this->data;
-	this->data = new T[other.size_vector];
-	this->size_vector = other.size_vector;
-	memcpy(this->data, other.data, other.size_vector * sizeof(T));
+	if (!this) {
+		delete[] this->data;
+		this->data = new T[other.size_vector];
+		this->size_vector = other.size_vector;
+		for (int i = 0; i < other.size_vector; i++) {
+			data[i] = other.data[i];
+		}
+	}
 	return *this;
  }
 
@@ -145,20 +149,24 @@ bool vector<T>::empty() {
 
 template<class T>
 void vector<T>::push_back(T value) {
-	T* tmp = new T[this->size_vector + 1];
-	memcpy(tmp, this->data, this->size_vector * sizeof(T));
-	tmp[this->size_vector] = value;
-	delete[] this->data;
-	this->data = tmp;
+	T* tmp = this->data;
+	this->data = new T[size_vector + 1];
+	for (int i = 0; i < size_vector; i++) {
+		this->data[i] = tmp[i];
+	}
+	this->data[size_vector] = value;
+	delete[] tmp;
 	this->size_vector++;
 }
 
 template<class T>
 void vector<T>::pop_back() {
-	T* tmp = new T[this->size_vector - 1];
-	memcpy(tmp, this->data, (this->size_vector - 1) * sizeof(T));
-	delete[] this->data;
-	this->data = tmp;
+	T* tmp = data;
+	this->data = new T[size_vector - 1];
+	for (int i = 0; i < size_vector - 1; i++) {
+		this->data[i] = tmp[i];
+	}
+	delete[] tmp;
 	this->size_vector--;
 }
 
@@ -233,7 +241,7 @@ const T vector<T>::back() {
 template<class T>
 void vector<T>::clear() {
 	delete[] this->data;
-	this->data = 0;
+	this->data = nullptr;
 	this->size_vector = 0;
 }
 
@@ -252,9 +260,4 @@ T* vector<T>::begin() {
 template<class T>
 T* vector<T>::end() {
 	return this->data + this->size_vector;
-}
-
-template<class T>
-unsigned char vector<T>::size_type() {
-	return sizeof(T);
 }
