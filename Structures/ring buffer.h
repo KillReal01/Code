@@ -174,12 +174,12 @@ public:
 		--size_;
 	}
 
-	T* front() {
-		return &arr_[0];
+	T front() {
+		return arr_[0];
 	}
 
-	T* back() {
-		return &arr_[size_];
+	T back() {
+		return arr_[size_ - 1];
 	}
 
 	T& operator[](int index) {
