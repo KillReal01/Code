@@ -116,7 +116,7 @@ number TMatrix::det() { // определитель матрицы
 
 int TMatrix::rank() { // ранг матрицы
   TMatrix a = this->triangle_matrix();
-  std::cout << a << "\n";
+  // std::cout << a << "\n";
   for (int i = this->dim - 1; i >= 0; i--) {
     for (int j = 0; j < this->dim; j++) {
       if (a.mtx[i][j] != 0)

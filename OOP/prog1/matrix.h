@@ -22,7 +22,7 @@ public:
   // TMatrix &operator=(const TMatrix &);
 
 private:
-  int dim = 5;
+  int dim;
   number **mtx;
 
   void clear();

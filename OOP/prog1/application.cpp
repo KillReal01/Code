@@ -4,7 +4,7 @@ TApplication::TApplication() {}
 
 int TApplication::exec() {
   int ch;
-  int dim = 2;
+  int dim = 3;
   TMatrix a(dim);
 
   while (true) {
