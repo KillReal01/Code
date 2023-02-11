@@ -14,13 +14,13 @@ TMatrix::TMatrix(int n) { // конструктор
 
 TMatrix::~TMatrix() { this->clear(); } // деструктор
 
-TMatrix::TMatrix(TMatrix *other) { // конструктор копирования
-  int d = other->dim;
+TMatrix::TMatrix(const TMatrix &other) { // конструктор копирования
+  int d = other.dim;
   this->mtx = this->allocate_memory(d);
   this->dim = d;
   for (int i = 0; i < d; i++) {
     for (int j = 0; j < d; j++) {
-      this->mtx[i][j] = other->mtx[i][j];
+      this->mtx[i][j] = other.mtx[i][j];
     }
   }
 }
@@ -65,7 +65,7 @@ void TMatrix::transpose() { // транспонирование матрицы
 }
 
 TMatrix TMatrix::triangle_matrix() {
-  TMatrix a(this);
+  TMatrix a(*this);
   int n = a.dim;
 
   int countSwaps = 1;

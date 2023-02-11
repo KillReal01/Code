@@ -8,7 +8,7 @@ class TMatrix {
 public:
   TMatrix();
   TMatrix(int);
-  TMatrix(TMatrix *);
+  TMatrix(const TMatrix &);
   ~TMatrix();
 
   void set();
