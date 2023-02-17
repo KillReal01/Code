@@ -15,11 +15,7 @@ public:
   void transpose();
   int rank();
   number det();
-
   friend std::ostream &operator<<(std::ostream &, TMatrix &);
-  // void print();
-  // TMatrix operator*(const int);
-  // TMatrix &operator=(const TMatrix &);
 
 private:
   int dim;

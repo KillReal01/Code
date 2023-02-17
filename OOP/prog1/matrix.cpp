@@ -99,9 +99,7 @@ TMatrix TMatrix::triangle_matrix() {
     }
   }
 
-  a.mtx[0][0] =
-      a.mtx[0][0] * countSwaps; // надо поменять знак определителя (1-ый элемент
-                                // не 0 в невырожденной матрице)
+  a.mtx[0][0] = a.mtx[0][0] * countSwaps; // надо поменять знак определителя
   return a;
 }
 
@@ -109,6 +107,8 @@ number TMatrix::det() { // определитель матрицы
   TMatrix a = this->triangle_matrix();
   number det = a.mtx[0][0];
   for (int i = 1; i < a.dim; i++) {
+    if (a.mtx[i][i] == number(0))
+      return number(0);
     det = det * a.mtx[i][i];
   }
   return det;
@@ -119,7 +119,7 @@ int TMatrix::rank() { // ранг матрицы
   // std::cout << a << "\n";
   for (int i = this->dim - 1; i >= 0; i--) {
     for (int j = 0; j < this->dim; j++) {
-      if (a.mtx[i][j] != number(0))
+      if (a.mtx[i][j] != 0)
         return i + 1;
     }
   }
@@ -135,34 +135,3 @@ std::ostream &operator<<(std::ostream &os, TMatrix &a) {
   }
   return os;
 }
-
-// TMatrix TMatrix::operator*(const int value) {
-//   TMatrix a(this);
-//   for (int i = 0; i < this->dim; i++) {
-//     for (int j = 0; j < this->dim; j++) {
-//       if (this->mtx[i][j])
-//         a.mtx[i][j] = value * this->mtx[i][j];
-//     }
-//   }
-//   return a;
-// }
-
-// TMatrix &TMatrix::operator=(const TMatrix &other) {
-//   this->dim = other.dim;
-//   for (int i = 0; i < this->dim; i++) {
-//     for (int j = 0; j < this->dim; j++) {
-//       this->mtx[i][j] = other.mtx[i][j];
-//     }
-//   }
-//   return *this;
-// }
-
-// void TMatrix::print() { // вывод матрицы
-//   for (int i = 0; i < this->dim; i++) {
-//     for (int j = 0; j < this->dim; j++) {
-//       std::cout << this->mtx[i][j] << " ";
-//     }
-//     std::cout << "\n";
-//   }
-//   std::cout << "\n";
-// }
