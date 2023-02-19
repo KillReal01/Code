@@ -7,7 +7,7 @@ TMatrix::TMatrix(int n) { // конструктор
   mtx = this->allocate_memory(n);
   for (int i = 0; i < this->dim; i++) {
     for (int j = 0; j < this->dim; j++) {
-      mtx[i][j] = i + j;
+      mtx[i][j] = number(i + j);
     }
   }
 }
