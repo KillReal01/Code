@@ -1,9 +1,7 @@
 #include "complex.h"
+#include <math.h>
 
-TComplex::TComplex()
-{
-
-}
+TComplex::TComplex() {}
 
 TComplex::TComplex(const double &n)
 {
@@ -15,14 +13,6 @@ TComplex::TComplex(const double &a, const double &b)
 {
     this->real = a;
     this->image = b;
-}
-
-TComplex TComplex::conjugate_number()
-{
-    TComplex temp;
-    temp.real = this->real;
-    temp.image = -this->image;
-    return temp;
 }
 
 TComplex TComplex::operator+(const TComplex &c)
@@ -83,9 +73,9 @@ TComplex TComplex::operator/(const double &n)
 
 TComplex TComplex::operator/(const TComplex &c)
 {
-    TComplex res(*this);
+    TComplex res(*this), temp(c.real, -c.image);
     double del = c.real * c.real + c.image * c.image;
-    res = res * res.conjugate_number() / del;
+    res = res * temp / del;
     return res;
 }
 
@@ -106,42 +96,22 @@ bool TComplex::operator!=(const TComplex &c)
     return !(this->real == c.real && this->image == c.image);
 }
 
-bool TComplex::operator>(const TComplex &c)
+double abs(TComplex &c)
 {
-    return (this->real > c.real);
+    return std::sqrt(c.getReal() * c.getReal() + c.getImage() * c.getImage());
 }
 
-bool TComplex::operator<(const TComplex &c)
+double TComplex::getReal()
 {
-    return (this->real < c.real);
+    return this->real;
 }
 
-TComplex abs(const TComplex &c)
+double TComplex::getImage()
 {
-    TComplex temp;
-    temp.real = (c.real > 0) ? c.real : -c.real;
-    temp.image = (c.image > 0) ? c.image : -c.image;
-    return temp;
+    return this->image;
 }
 
-//TComplex TComplex::abs(const TComplex & c)
-//{
-//    TComplex temp;
-//    temp.real = std::abs(c.real);
-//    temp.image = std::abs(c.image);
-//    return temp;
-//}
-
-//std::iostream &std::abs(std::iostream &s, TComplex &c)
-//{
-//    TComplex temp;
-//    temp.real = std::abs(c.real);
-//    temp.image = std::abs(c.image);
-//    s << temp;
-//    return s;
-//}
-
-std::istream& operator>>(std::istream &is, const TComplex& c)
+std::istream& operator>>(std::istream &is, TComplex& c)
 {
     is >> c.real >> c.image;
     return is;

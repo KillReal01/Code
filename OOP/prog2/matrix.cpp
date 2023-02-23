@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include <math.h>
 
 TMatrix::TMatrix() {} // конструктор
 
@@ -69,15 +70,15 @@ TMatrix TMatrix::triangle_matrix() {
   int n = a.dim;
 
   int countSwaps = 1;
-  number eps = 1.0e-6;
+  double eps = 1.0e-6;
 
   for (int i = 0; i < n; ++i) {
     // находим строку с максимальным первым элементом
     int iMax = i;
     for (int j = i + 1; j < n; ++j)
-      if (std::abs(a.mtx[j][i]) > std::abs(a.mtx[iMax][i]))
+      if (abs(a.mtx[j][i]) > abs(a.mtx[iMax][i]))
         iMax = j;
-    if (std::abs(a.mtx[iMax][i]) < eps) {
+    if (abs(a.mtx[iMax][i]) < eps) {
       continue;
     }
     for (int k = 0; k < n; ++k)
@@ -94,7 +95,7 @@ TMatrix TMatrix::triangle_matrix() {
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      if (a.mtx[i][j] < eps)
+      if (abs(a.mtx[i][j]) < eps)
         a.mtx[i][j] = number(0);
     }
   }

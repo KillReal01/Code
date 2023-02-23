@@ -25,17 +25,12 @@ public:
     TComplex operator=(const TComplex &);
     bool operator==(const TComplex &);
     bool operator!=(const TComplex &);
-    bool operator>(const TComplex &);
-    bool operator<(const TComplex &);
 
-    TComplex conjugate_number();
+    double getReal();
+    double getImage();
+    friend double abs(TComplex&);
 
-    //TComplex abs( const TComplex&);
-    //friend std::iostream& abs (std::iostream &s, TComplex&);
-
-    friend TComplex abs (const TComplex&);
-
-    friend std::istream& operator >> (std::istream &, const TComplex&);
+    friend std::istream& operator >> (std::istream &, TComplex&);
     friend std::ostream& operator << (std::ostream &, const TComplex&);
 };
 
