@@ -12,6 +12,7 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QGridLayout>
+#include <QScrollArea>
 
 class TInterface : public QWidget
 {
@@ -25,6 +26,8 @@ private:
     QGroupBox *buttons_layout, *input_layout, *grid_layout;
     QHBoxLayout *layout, *footer, ***numbers;
     QGridLayout *grid;
+    QScrollArea *scrollArea;
+
     int size = 3;
 
     void clear();

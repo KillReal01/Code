@@ -4,6 +4,7 @@ TInterface::TInterface(QWidget *parent)
     : QWidget(parent)
 {
     setWindowTitle("Работа №3");
+    setFixedSize(700, 500);
 
     // поля для кнопок
     button_det = new QPushButton("Определитель", this);
@@ -24,6 +25,8 @@ TInterface::TInterface(QWidget *parent)
     output = new QLabel("", this);
     output->setFixedWidth(150);
     //выравнивание
+
+
     input_layout = new QGroupBox(this);
     footer = new QHBoxLayout(input_layout);
 
@@ -45,6 +48,13 @@ TInterface::TInterface(QWidget *parent)
     grid_layout = new QGroupBox(this);
     grid = new QGridLayout(grid_layout);
     grid->setSpacing(50);
+
+    //
+    scrollArea = new QScrollArea(this);
+    scrollArea->setWidget(grid_layout);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setMinimumSize(QSize(700, 400));
+    scrollArea->setGeometry(0, 0, 700, 400);
 
     //рендеринг
     this->rendering();
@@ -74,28 +84,20 @@ TInterface::~TInterface()
     delete layout;
     delete footer;
     delete grid;
+
+    delete scrollArea;
 }
 
 void TInterface::rendering()
 {
-    setFixedSize(700, (size + 1) * 90);
-
     // поля для матрицы
     this->allocate_memory();
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            //grid->addLayout(numbers[i][j], i, j);
-            //grid->addWidget(numerator[i][j], i, 3 * j);
             numerator[i][j]->setAlignment(Qt::AlignCenter);
-
-            //grid->addWidget(delimiter[i][j], i, 3 * j + 1);
-
-            //grid->addWidget(denominator[i][j], i, 3 * j + 2);
             denominator[i][j]->setAlignment(Qt::AlignCenter);
         }
     }
-
-    grid_layout->setGeometry(0, 0, maximumWidth(), maximumHeight() - 100);
     buttons_layout->setGeometry(0, maximumHeight() - 100, maximumWidth(), 50);
     input_layout->setGeometry(0, maximumHeight() - 50, maximumWidth(), 50);
 }
@@ -117,8 +119,13 @@ void TInterface::allocate_memory()
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             delimiter[i][j] = new QLabel("/", this);
+            delimiter[i][j]->setFixedWidth(5);
+
             numerator[i][j] = new QLineEdit(QString::number(i + j), this);
+            numerator[i][j]->setFixedWidth(70);
+
             denominator[i][j] = new QLineEdit("1", this);
+            denominator[i][j]->setFixedWidth(70);
 
             numbers[i][j] = new QHBoxLayout();
             numbers[i][j]->addWidget(numerator[i][j]);
