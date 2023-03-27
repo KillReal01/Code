@@ -60,18 +60,11 @@ TInterface::TInterface(QWidget *parent)
     //рендеринг
     this->rendering();
 
-//    connect(button_det, SIGNAL(pressed()), this, SLOT(getDet()));
-//    connect(button_rank, SIGNAL(pressed()), this, SLOT(getRank()));
-//    connect(button_transpose, SIGNAL(pressed()), this, SLOT(transposeMtx()));
     connect(button_enter, SIGNAL(pressed()), this, SLOT(enterDim()));
     connect(button_accept, SIGNAL(pressed()), this, SLOT(accept()));
-
     connect(button_det,SIGNAL(pressed()),this,SLOT(formRequest()));
     connect(button_rank,SIGNAL(pressed()),this,SLOT(formRequest()));
     connect(button_transpose, SIGNAL(pressed()), this, SLOT(formRequest()));
-    //connect(button_enter, SIGNAL(pressed()), this, SLOT(formRequest()));
-    //connect(button_accept, SIGNAL(pressed()), this, SLOT(formRequest()));
-
 }
 
 TInterface::~TInterface()
@@ -119,7 +112,6 @@ void TInterface::formRequest()
     if (btn == button_transpose)
         msg << QString().setNum(TRANSPOSE);
 
-    qDebug() << msg;
     emit request(msg);
 }
 
@@ -128,34 +120,49 @@ void TInterface::answer(QString msg)
     QString text;
     int p = msg.indexOf(separator);
     int t = msg.left(p).toInt();
-    msg = msg.mid(p + 1, msg.length() - p - 2);
+    //msg = msg.mid(p + 1, msg.length() - p - 2);
+    msg = msg.right(msg.length() - p - 1);
+
     switch (t) {
     case DETERMINANT:
+    {
         text = "Определитель = ";
         p = msg.indexOf(separator);
-        text += msg.left(p);
-        text += " = ";
-        text += msg.right(msg.length() - p - 1);
+        int a = msg.left(p).toInt();
+
+        msg = msg.right(msg.length() - p - 1);
+        p = msg.indexOf(separator);
+        int b = msg.left(p).toInt();
+
+        text += QString::number(a) + "/" + QString::number(b);
         output->setText(text);
         break;
+    }
     case RANK:
+    {
         text = "Ранг = ";
-        text += msg;
+        p = msg.indexOf(separator);
+        text += QString::number(msg.left(p).toInt());
         output->setText(text);
         break;
+    }
     case TRANSPOSE:
+    {
         //заполнить матрицу
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 p = msg.indexOf(separator);
                 numerator[i][j]->setText(QString::number(msg.left(p).toInt()));
-                p = msg.indexOf(separator, p + 1);
+                msg = msg.right(msg.length() - p - 1);
+
+                p = msg.indexOf(separator);
                 denominator[i][j]->setText(QString::number(msg.left(p).toInt()));
                 msg = msg.right(msg.length() - p - 1);
             }
         }
         output->setText("Матрица транспонирована");
         break;
+    }
     default: break;
     }
 }

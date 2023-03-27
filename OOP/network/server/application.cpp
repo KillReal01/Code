@@ -20,42 +20,47 @@ void TApplication::recieve(QByteArray msg)
 
     TMatrix mtx(size, msg);
 
-    msg = msg.right(6);
-    qDebug() << msg.toInt();
-
-    //reduce ;
     pos = msg.indexOf(separator.toLatin1());
-
     int t = msg.left(pos).toInt();
+
     switch (t) {
     case DETERMINANT:
-        //number ans = mtx.det();
-        //s << ans;
+    {
+        number ans;
+        ans = mtx.det();
+        s << QString::number(ans.getNumerator()) << QString::number(ans.getDenominator());
         answer << QString().setNum(DETERMINANT);
         answer += s;
         break;
+    }
     case RANK:
-        //int r = mtx.rank();
-        //s << QString::number(r);
+    {
+        int r = mtx.rank();
+        s << QString::number(r);
         answer << QString().setNum(RANK);
         answer += s;
         break;
+    }
     case TRANSPOSE:
+    {
         mtx.transpose();
-        //int d = mtx.getDim();
-//        number **m = mtx.getMtx();
-//        for (int i = 0; i < d; i++) {
-//            for (int j = 0; j < d; j++) {
-//                s << m[i][j];
-//            }
-//        }
+        int d = mtx.getDim();
+        number **m = mtx.getMtx();
+        for (int i = 0; i < d; i++) {
+            for (int j = 0; j < d; j++) {
+                s << QString::number(m[i][j].getNumerator()) << QString::number(m[i][j].getDenominator());
+            }
+        }
 
-//        for (int i = 0; i < d; i++) {
-//            delete[] m[i];
-//        }
-//        delete[] m;
+        for (int i = 0; i < d; i++) {
+            delete[] m[i];
+        }
+        delete[] m;
 
+        answer << QString().setNum(TRANSPOSE);
+        answer += s;
         break;
+    }
     default:
         return;
     }

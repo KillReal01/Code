@@ -1,9 +1,6 @@
 #ifndef TINTERFACE_H
 #define TINTERFACE_H
 
-//#include "matrix.h"
-//#include "number.h"
-
 #include <QWidget>
 #include <QLabel>
 #include <QLineEdit>

@@ -125,7 +125,7 @@ std::ostream &operator<<(std::ostream &os, const TRational &c)
 
 QString &operator<<(QString &s, TRational &c)
 {
-    s += QString::number(c.getNumerator()) + "/" + QString::number(c.getDenominator());
+    s += QString::number(c.getNumerator()) + "/" + QString::number(c.getDenominator()) + TRational::SEPARATOR;
     return s;
 }
 
@@ -143,16 +143,14 @@ TRational::TRational(const QByteArray& arr)
     int p = arr.indexOf(TRational::SEPARATOR.toLatin1());
     this->numerator = arr.left(p).toInt();
 
-    p = arr.indexOf(TRational::SEPARATOR.toLatin1(), p + 1);
-    this->denominator = arr.left(p).toInt();
-    //re = arr.left(p).toDouble();
-    //im = arr.right(arr.length()-p-1).toDouble();
+    p = arr.indexOf(TRational::SEPARATOR.toLatin1());
+    this->denominator = arr.right(arr.length() - p - 1).toInt();
 }
 
 QByteArray& operator>>(QByteArray& arr, TRational& c)
 {
     int p = arr.indexOf(TRational::SEPARATOR.toLatin1());
-    p = arr.indexOf(TRational::SEPARATOR.toLatin1(),p+1);
+    p = arr.indexOf(TRational::SEPARATOR.toLatin1(), p + 1);
     if (p > 0)
     {
         c = TRational(arr.left(p));
