@@ -28,7 +28,7 @@ void TApplication::recieve(QByteArray msg)
     {
         number ans;
         ans = mtx.det();
-        s << QString::number(ans.getNumerator()) << QString::number(ans.getDenominator());
+        s << ans;
         answer << QString().setNum(DETERMINANT);
         answer += s;
         break;
@@ -44,19 +44,7 @@ void TApplication::recieve(QByteArray msg)
     case TRANSPOSE:
     {
         mtx.transpose();
-        int d = mtx.getDim();
-        number **m = mtx.getMtx();
-        for (int i = 0; i < d; i++) {
-            for (int j = 0; j < d; j++) {
-                s << QString::number(m[i][j].getNumerator()) << QString::number(m[i][j].getDenominator());
-            }
-        }
-
-        for (int i = 0; i < d; i++) {
-            delete[] m[i];
-        }
-        delete[] m;
-
+        s << mtx;
         answer << QString().setNum(TRANSPOSE);
         answer += s;
         break;

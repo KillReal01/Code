@@ -49,33 +49,6 @@ TMatrix::TMatrix(const TMatrix &other) { // конструктор копиро�
   }
 }
 
-//void TMatrix::getMtx(QLineEdit ***&numerator, QLineEdit ***&denominator)
-//{
-//  int n = this->dim;
-//  for (int i = 0; i < n; i++) {
-//    for (int j = 0; j < n; j++) {
-//      numerator[i][j]->setText(QString::number(mtx[i][j].getNumerator()));
-//      denominator[i][j]->setText(QString::number(mtx[i][j].getDenominator()));
-//    }
-//  }
-//}
-
-int TMatrix::getDim()
-{
-  return this->dim;
-}
-
-number **TMatrix::getMtx()
-{
-  number **a = this->allocate_memory(this->dim);
-  for (int i = 0; i < this->dim; i++) {
-    for (int j = 0; j < this->dim; j++) {
-      a[i][j] = this->mtx[i][j];
-    }
-  }
-  return a;
-}
-
 number **TMatrix::allocate_memory(int n) {
   number **a;
   a = new number *[n];
@@ -167,7 +140,6 @@ number TMatrix::det() { // определитель матрицы
 
 int TMatrix::rank() { // ранг матрицы
   TMatrix a = this->triangle_matrix();
-  // std::cout << a << "\n";
   for (int i = this->dim - 1; i >= 0; i--) {
     for (int j = 0; j < this->dim; j++) {
       if (a.mtx[i][j] != number(0))
@@ -186,3 +158,15 @@ std::ostream &operator<<(std::ostream &os, TMatrix &a) {
   }
   return os;
 }
+
+QString &operator<<(QString &s, TMatrix &c)
+{
+  int n = c.dim;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      s << c.mtx[i][j];
+    }
+  }
+  return s;
+}
+

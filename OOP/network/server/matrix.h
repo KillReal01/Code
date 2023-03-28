@@ -14,9 +14,6 @@ public:
   //TMatrix(int, QLineEdit ***, QLineEdit ***);
   ~TMatrix();
 
-  int getDim();
-  number **getMtx();
-
   void set();
   void transpose();
   int rank();
@@ -24,6 +21,7 @@ public:
 
   //void getMtx(QLineEdit ***&, QLineEdit ***&);
   friend std::ostream &operator<<(std::ostream &, TMatrix &);
+  friend QString & operator << (QString &, TMatrix &);
 
 private:
   int dim;

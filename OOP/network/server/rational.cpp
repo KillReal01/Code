@@ -125,7 +125,8 @@ std::ostream &operator<<(std::ostream &os, const TRational &c)
 
 QString &operator<<(QString &s, TRational &c)
 {
-    s += QString::number(c.getNumerator()) + "/" + QString::number(c.getDenominator()) + TRational::SEPARATOR;
+    s += QString::number(c.getNumerator()) + TRational::SEPARATOR;
+    s += QString::number(c.getDenominator()) + TRational::SEPARATOR;
     return s;
 }
 
