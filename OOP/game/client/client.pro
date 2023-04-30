@@ -12,13 +12,11 @@ INCLUDEPATH += ../common
 
 SOURCES += \
     ../common/common.cpp \
-    ../common/communicator.cpp \
     main.cpp \
     interface.cpp
 
 HEADERS += \
     ../common/common.h \
-    ../common/communicator.h \
     interface.h
 
 # Default rules for deployment.

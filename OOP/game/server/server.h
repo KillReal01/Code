@@ -1,11 +1,13 @@
 #ifndef TSERVER_H
 #define TSERVER_H
 
+
 #include <iostream>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QVector>
 #include <QSignalMapper>
+#include "clienthandler.h"
 
 const int count_clients = 2;
 
@@ -17,7 +19,9 @@ public:
 
 private:
     QTcpSocket *socket;
+    //QTcpSocket *socket_read = nullptr, *socket_write = nullptr;
     QVector<QTcpSocket *> client_sockets;
+    //QVector<QTcpSocket *> client_read, client_write;
     QByteArray data;
 
 
@@ -29,12 +33,11 @@ private:
 signals:
     void recieved(QByteArray);
 
-
 public slots:
     void recieve(QByteArray);
     void send(QByteArray);
     void incomingConnection(qintptr) override;
-    void readyToRead();
+    void onReadReady();
     void deleteLater();
 };
 

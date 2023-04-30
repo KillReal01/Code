@@ -7,7 +7,8 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QGridLayout>
-
+#include <QThread>
+#include <QVBoxLayout>
 class TInterface : public QWidget
 {
     Q_OBJECT
@@ -20,6 +21,7 @@ private:
     int step = 0; //текущее количество ходов
     int score = 0;
     QTcpSocket *socket;
+    QTcpSocket *socket_write, *socket_read;
     QByteArray data;
 
     QPushButton **buttons;
@@ -32,7 +34,9 @@ signals:
     void recieved(QByteArray);
 
 public slots:
-    void readyToRead();
+    void onBytesWritten(qint64);
+    void onReadReady();
+    //void deleteLater();
     void recieve(QByteArray);
     void send();
 };

@@ -5,20 +5,35 @@ TInterface::TInterface(QWidget *parent)
     : QWidget(parent)
 {
     setWindowTitle("Игра");
-    setFixedSize(600, 500);
+    setFixedSize(600, 400);
 
-    //сокет
-    socket = new QTcpSocket();
-    socket->connectToHost("127.0.0.1", 2323);
+    //сокеты
+    QString host = "127.0.0.1";
+    int port = 2323;
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyToRead()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    socket = new QTcpSocket(this);
+    socket->connectToHost(host, port);
+
+    //
+    socket_write = new QTcpSocket();
+    socket_read = new QTcpSocket();
+    socket_write->setSocketDescriptor(socket->socketDescriptor());
+    socket_read->setSocketDescriptor(socket->socketDescriptor());
+
+    connect(socket_read, SIGNAL(readyRead()), this, SLOT(onReadReady()));
+    connect(socket_write, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
+    //connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+
+    //
+
+    //connect(socket, SIGNAL(readyRead()), this, SLOT(onReadReady()));
+    //connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+
 
     //выравнивание кнопок
     gridLayout = new QGridLayout(this);
-    this->setLayout(gridLayout);
-    //кнопки
 
+    //кнопки
     buttons = new QPushButton *[count_box];
     for (int i = 0; i < count_box; i++) {
         buttons[i] = new QPushButton(QString::number(i + 1), this);
@@ -30,8 +45,8 @@ TInterface::TInterface(QWidget *parent)
     your_score = new QLabel("У вас 0 очков", this);
     enemy_score = new QLabel("У соперника: 0 очков", this);
 
-    your_score->setGeometry(50, 25, 100, 50);
-    enemy_score->setGeometry(200, 25, 200, 50);
+    your_score->setGeometry(50, 20, 100, 30);
+    enemy_score->setGeometry(300, 20, 200, 30);
 
     //сигнал-слоты
     connect(this,SIGNAL(recieved(QByteArray)),this, SLOT(recieve(QByteArray)));
@@ -50,16 +65,32 @@ TInterface::~TInterface()
     delete gridLayout;
 }
 
-void TInterface::readyToRead()
+//void TInterface::deleteLater()
+//{
+//    socket->deleteLater();
+//    QString host = "127.0.0.1";
+//    int port = 2323;
+//    qDebug() << "Disconnected";
+//}
+
+void TInterface::onBytesWritten(qint64 bytes)
 {
-    qDebug() << "bytesAvailable " << socket->bytesAvailable();
-    if (socket->bytesAvailable()) {
-        QByteArray data = socket->readAll();
-        qDebug() << "recieved " << data;
-        emit recieved(data);
-    }
+    qDebug() << "Bytes written: " << bytes;
 }
 
+void TInterface::onReadReady()
+{
+    if (socket_read->bytesAvailable()) {
+        QByteArray data = socket_read->readAll();
+        qDebug() << "Received data: " << data;
+        emit recieved(data);
+    }
+//    if (socket->bytesAvailable()) {
+//        QByteArray data = socket->readAll();
+//        qDebug() << "Received data: " << data;
+//        emit recieved(data);
+//    }
+}
 
 void TInterface::recieve(QByteArray msg)
 {
@@ -76,8 +107,8 @@ void TInterface::recieve(QByteArray msg)
                 pressButton(buttons[i], money);
             }
         }
-
         enemy_score->setText("У соперника: " + QString::number(enemy_sc) + " очков");
+        //socket_write->blockSignals(false);//разблокировать ввод
         break;
     }
     case MONEY: {
@@ -87,6 +118,7 @@ void TInterface::recieve(QByteArray msg)
         pressButton(button_pressed, money);
         score += money;
         your_score->setText("У вас " + QString::number(score) + " очков");
+        //socket_write->blockSignals(true);//заблокировать ввод
         break;
     }
     }
@@ -108,16 +140,12 @@ void TInterface::recieve(QByteArray msg)
 void TInterface::send()
 {
     if (step < 5) {
-        QPushButton *button_send = (QPushButton *) sender();
-        button_pressed = button_send;
-        //pressButton(button_send);
+        button_pressed = (QPushButton *) sender();
+        int btnnum = button_pressed->text().toInt();
 
-        int btnnum = button_send->text().toInt();
         QString s;
-        s << btnnum;
-        s << score;
-
-        socket->write(s.toUtf8());
+        s << btnnum << score;
+        socket_write->write(s.toUtf8());
         step++;
     }
 }
