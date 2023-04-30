@@ -201,10 +201,10 @@ void TInterface::answer(QString msg)
             break;
         }
         case COMPLEX_MODE: {
-            int a = msg.left(p).toInt();
+            double a = msg.left(p).toDouble();
             msg = msg.right(msg.length() - p - 1);
             p = msg.indexOf(separator);
-            int b = msg.left(p).toInt();
+            double b = msg.left(p).toDouble();
             text += "(" + QString::number(a) + ") + (" + QString::number(b) + "i)";
             break;
         }

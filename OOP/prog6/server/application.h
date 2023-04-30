@@ -11,6 +11,7 @@ class TApplication : public QCoreApplication
     Q_OBJECT
     TCommunicator *comm;
 
+
 public:
     TApplication(int, char**);
 

@@ -139,10 +139,10 @@ QString &operator<<(QString &s, TComplex &c)
 TComplex::TComplex(const QByteArray& arr)
 {
     int p = arr.indexOf(TComplex::SEPARATOR.toLatin1());
-    this->real = arr.left(p).toInt();
+    this->real = arr.left(p).toDouble();
 
     p = arr.indexOf(TComplex::SEPARATOR.toLatin1());
-    this->image = arr.right(arr.length() - p - 1).toInt();
+    this->image = arr.right(arr.length() - p - 1).toDouble();
 }
 
 QByteArray& operator>>(QByteArray& arr, TComplex& c)

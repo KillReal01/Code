@@ -18,6 +18,12 @@ enum modes
 };
 
 extern const QChar separator;
+
 QString& operator<< (QString&,const QString&);
+QString &operator<<(QString &s, double &c);
+QString &operator<<(QString &s, int &c);
+
+QByteArray &operator>>(QByteArray &arr, double &c);
+QByteArray &operator>>(QByteArray &arr, int &c);
 
 #endif // COMMON_H

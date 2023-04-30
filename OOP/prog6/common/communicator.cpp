@@ -3,9 +3,12 @@
 TCommunicator::TCommunicator(TCommParams& pars, QObject *parent) : QUdpSocket(parent)
 {
     params = pars;
-    ready = bind(params.rHost, params.rPort,
+    ready = bind(params.rHost,
+                 params.rPort,
                  QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
-    if (ready) connect(this,SIGNAL(readyRead()),this,SLOT(recieve()));
+    if (ready) {
+        connect(this, SIGNAL(readyRead()), this, SLOT(recieve()));
+    }
 }
 
 bool TCommunicator::isReady()
