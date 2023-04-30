@@ -236,12 +236,19 @@ void TInterface::answer(QString msg)
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 p = msg.indexOf(separator);
-                numerator[i][j]->setText(QString::number(msg.left(p).toInt()));
+
+                if (mode == COMPLEX_MODE || mode == REAL_MODE)
+                    numerator[i][j]->setText(QString::number(msg.left(p).toDouble()));
+                else
+                    numerator[i][j]->setText(QString::number(msg.left(p).toInt()));
                 msg = msg.right(msg.length() - p - 1);
 
                 if (mode != REAL_MODE){
                     p = msg.indexOf(separator);
-                    denominator[i][j]->setText(QString::number(msg.left(p).toInt()));
+                    if (mode == COMPLEX_MODE)
+                        denominator[i][j]->setText(QString::number(msg.left(p).toDouble()));
+                    else
+                        denominator[i][j]->setText(QString::number(msg.left(p).toInt()));
                     msg = msg.right(msg.length() - p - 1);
                 }
             }
