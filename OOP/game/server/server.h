@@ -1,13 +1,12 @@
 #ifndef TSERVER_H
 #define TSERVER_H
 
-
 #include <iostream>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QVector>
 #include <QSignalMapper>
-#include "clienthandler.h"
+#include <QThread>
 
 const int count_clients = 2;
 
@@ -18,24 +17,21 @@ public:
     TServer(QObject *parent = nullptr);
 
 private:
+    QThread *thread;
     QTcpSocket *socket;
-    //QTcpSocket *socket_read = nullptr, *socket_write = nullptr;
     QVector<QTcpSocket *> client_sockets;
-    //QVector<QTcpSocket *> client_read, client_write;
     QByteArray data;
 
 
-    QVector<int> score;
+    QVector<int> score, money;
     QVector<int> generateMoney(int);
-
-    //QSignalMapper *signalMapper[count_clients];
 
 signals:
     void recieved(QByteArray);
 
 public slots:
     void recieve(QByteArray);
-    void send(QByteArray);
+    void send(int, QByteArray);
     void incomingConnection(qintptr) override;
     void onReadReady();
     void deleteLater();

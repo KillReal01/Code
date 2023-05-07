@@ -11,7 +11,6 @@ CONFIG -= app_bundle
 INCLUDEPATH += ../common
 
 SOURCES += \
-    clienthandler.cpp \
         main.cpp \
         server.cpp \
         ../common/common.cpp \
@@ -22,6 +21,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    clienthandler.h \
     server.h\
     ../common/common.h \

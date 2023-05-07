@@ -14,39 +14,51 @@ TInterface::TInterface(QWidget *parent)
     socket = new QTcpSocket(this);
     socket->connectToHost(host, port);
 
-    //
-    socket_write = new QTcpSocket();
-    socket_read = new QTcpSocket();
-    socket_write->setSocketDescriptor(socket->socketDescriptor());
-    socket_read->setSocketDescriptor(socket->socketDescriptor());
+    //отправляем серверу флаг первого подключения
+    int rqst = CONNECT;
+    QString msg;
+    msg << rqst;
 
-    connect(socket_read, SIGNAL(readyRead()), this, SLOT(onReadReady()));
-    connect(socket_write, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
-    //connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
+    socket->write(msg.toUtf8());
+    client_access = UNLOCK;
 
-    //
+    connect(socket, SIGNAL(readyRead()), this, SLOT(onReadReady()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 
-    //connect(socket, SIGNAL(readyRead()), this, SLOT(onReadReady()));
-    //connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
-
+    //виджеты
+    wtext = new QWidget(this);
+    wtext->setGeometry(0, 0, this->width(), 100);
+    wbuttons = new QWidget(this);
+    wbuttons->setGeometry(0, 50, this->width(), this->height());
 
     //выравнивание кнопок
-    gridLayout = new QGridLayout(this);
+    gridLayout = new QGridLayout(wbuttons);
 
     //кнопки
     buttons = new QPushButton *[count_box];
     for (int i = 0; i < count_box; i++) {
-        buttons[i] = new QPushButton(QString::number(i + 1), this);
+        buttons[i] = new QPushButton(QString::number(i + 1), wbuttons);
         gridLayout->addWidget(buttons[i], round(i / 5), i % 5);
         connect(buttons[i], SIGNAL(clicked()), this, SLOT(send()));
     }
+    button_exit = new QPushButton("Отключиться", wbuttons);
+    connect(button_exit, SIGNAL(clicked()), this, SLOT(exit()));
+    gridLayout->addWidget(button_exit, round(count_box / 5) + 1, 4);
+
+    //выравнивание меток
+    gridLayoutLabel = new QGridLayout(wtext);
 
     //метки
-    your_score = new QLabel("У вас 0 очков", this);
-    enemy_score = new QLabel("У соперника: 0 очков", this);
+    your_score = new QLabel("У вас 0 очков", wtext);
+    your_score->setStyleSheet("font-size: 15px;");
+    your_score->setAlignment(Qt::AlignCenter);
 
-    your_score->setGeometry(50, 20, 100, 30);
-    enemy_score->setGeometry(300, 20, 200, 30);
+    turn = new QLabel("Ожидание подключения игрока...", wtext);
+    turn->setStyleSheet("font-size: 15px; color: red;");
+    turn->setAlignment(Qt::AlignCenter);
+
+    gridLayoutLabel->addWidget(your_score, 0, 0);
+    gridLayoutLabel->addWidget(turn, 0, 1);
 
     //сигнал-слоты
     connect(this,SIGNAL(recieved(QByteArray)),this, SLOT(recieve(QByteArray)));
@@ -54,8 +66,11 @@ TInterface::TInterface(QWidget *parent)
 
 TInterface::~TInterface()
 {
+    delete wtext;
+    delete wbuttons;
+
     delete your_score;
-    delete enemy_score;
+    delete turn;
 
     for (int i = 0; i < count_box; i++) {
         delete buttons[i];
@@ -63,98 +78,115 @@ TInterface::~TInterface()
 
     delete[] buttons;
     delete gridLayout;
+    delete gridLayoutLabel;
 }
 
-//void TInterface::deleteLater()
-//{
-//    socket->deleteLater();
-//    QString host = "127.0.0.1";
-//    int port = 2323;
-//    qDebug() << "Disconnected";
-//}
-
-void TInterface::onBytesWritten(qint64 bytes)
+void TInterface::exit()
 {
-    qDebug() << "Bytes written: " << bytes;
+    this->close();
 }
 
 void TInterface::onReadReady()
 {
-    if (socket_read->bytesAvailable()) {
-        QByteArray data = socket_read->readAll();
+    if (socket->bytesAvailable()) {
+        QByteArray data = socket->readAll();
         qDebug() << "Received data: " << data;
         emit recieved(data);
     }
-//    if (socket->bytesAvailable()) {
-//        QByteArray data = socket->readAll();
-//        qDebug() << "Received data: " << data;
-//        emit recieved(data);
-//    }
 }
 
-void TInterface::recieve(QByteArray msg)
+void TInterface::recieve(QByteArray msg) //клиент читает = флаг access + флаг messages + ...
 {
-    int mode;
-    msg >> mode;
+    int client_mode = 0;
+    msg >> client_access;
 
-    switch (mode) {
-    case INFO: {
-        int button_block, enemy_sc, money;
-        msg >> button_block >> enemy_sc >> money;
+    int button_block, enemy_sc, money;
+    if (client_access != END) {
+        msg >> client_mode;
+        switch (client_mode) {
+        case INFO: {
+            msg >> button_block >> enemy_sc >> money;
 
-        for (int i = 0; i < count_box; i++) {
-            if (buttons[i]->text() == QString::number(button_block)) {
-                pressButton(buttons[i], money);
+            for (int i = 0; i < count_box; i++) {
+                if (buttons[i]->text() == QString::number(button_block)) {
+                    pressButton(buttons[i], money, false);
+                }
             }
+            break;
         }
-        enemy_score->setText("У соперника: " + QString::number(enemy_sc) + " очков");
-        //socket_write->blockSignals(false);//разблокировать ввод
+        case MONEY: {
+            msg >> money;
+            pressButton(button_pressed, money, true);
+            score += money;
+            your_score->setText("У вас " + QString::number(score) + " очков");
+            break;
+        }
+        }
+    }
+    if (client_access == END) {
+        int enemy_score;
+        msg >> enemy_score;
+        if (score > enemy_score) {
+            QMessageBox::information(this, "Результат игры", "Поздравляем! Вы выиграли!\nСоперник набрал " + QString::number(enemy_score) + " очков");
+        } else if (score < enemy_score) {
+            QMessageBox::information(this, "Результат игры", "Увы, но Вы проиграли!\nСоперник набрал " + QString::number(enemy_score) + " очков");
+        } else {
+            QMessageBox::information(this, "Результат игры", "Спорный момент - ничья!\nСоперник набрал " + QString::number(enemy_score) + " очков");
+        }
+        this->close();
+    }
+
+    switch (client_access) {
+    case UNLOCK:
+        if (step < 5) {
+            turn->setStyleSheet("font-size: 15px;color: green;");
+            turn->setText("Ваш ход");
+        }
+        break;
+    case LOCK:
+        if (step < 5) {
+            turn->setStyleSheet("font-size: 15px;color: red;");
+            turn->setText("Ход соперника");
+        }
         break;
     }
-    case MONEY: {
-        int money;
-        msg >> money;
-
-        pressButton(button_pressed, money);
-        score += money;
-        your_score->setText("У вас " + QString::number(score) + " очков");
-        //socket_write->blockSignals(true);//заблокировать ввод
-        break;
+    if (step == 5 && !gameover) {
+        turn->setStyleSheet("font-size: 15px;color: red;");
+        turn->setText("Ваши ходы закончились");
+        QString s;
+        int rqst = DISCONNECT;
+        s << rqst << score;
+        socket->write(s.toUtf8());
+        gameover = true;
     }
-    }
-//    if (step == 5) {
-//        QMessageBox msgBox;
-//        msgBox.setWindowTitle("Результат игры");
-
-//        if (score < enemy_score->text().toInt())
-//            msgBox.setText("Вы проиграли!");
-//        else if (score > enemy_score->text().toInt())
-//            msgBox.setText("Вы выиграли!");
-//        else
-//            msgBox.setText("Ничья!");
-
-//        msgBox.exec();
-//    }
 }
 
-void TInterface::send()
+void TInterface::send() //клиент отправляет = флаг request + нажатую кнопку + свои очки
 {
-    if (step < 5) {
+    if (step < 5 && client_access == UNLOCK) //если остались ходы и есть доступ, отправляем серверу
+    {
         button_pressed = (QPushButton *) sender();
         int btnnum = button_pressed->text().toInt();
 
+        //отправляем серверу флаг не первого подключения
         QString s;
-        s << btnnum << score;
-        socket_write->write(s.toUtf8());
+        int rqst = HANDLE;
+        s << rqst << btnnum << score;
+        socket->write(s.toUtf8());
         step++;
     }
 }
 
-void pressButton(QPushButton *&btn, int money)
+void pressButton(QPushButton *&btn, int money, bool flag)
 {
-    btn->setText(QString::number(money) + " $");
+    if (flag) {
+        btn->setText(QString::number(money) + " $");
+    }
+    else{
+        btn->setText("Открыт");
+    }
     btn->setEnabled(false);
-    btn->setStyleSheet("color: black;background-color: #FFFF00;");
+    btn->setStyleSheet("color: black;background-color: #c2755d;");
 }
 
 

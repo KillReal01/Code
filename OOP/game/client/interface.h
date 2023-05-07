@@ -9,6 +9,9 @@
 #include <QGridLayout>
 #include <QThread>
 #include <QVBoxLayout>
+#include <QMutex>
+
+
 class TInterface : public QWidget
 {
     Q_OBJECT
@@ -20,27 +23,32 @@ public:
 private:
     int step = 0; //текущее количество ходов
     int score = 0;
+
+    int client_access;
+
+    QWidget *wtext, *wbuttons;
+
     QTcpSocket *socket;
-    QTcpSocket *socket_write, *socket_read;
     QByteArray data;
 
     QPushButton **buttons;
-    QPushButton *button_pressed;
-    QLabel *your_score, *enemy_score;
+    QPushButton *button_pressed, *button_exit;
+    QLabel *your_score, *turn;
 
-    QGridLayout *gridLayout;
+    QGridLayout *gridLayout, *gridLayoutLabel;
+    bool gameover = false;
 
 signals:
     void recieved(QByteArray);
+    void endGame();
 
 public slots:
-    void onBytesWritten(qint64);
     void onReadReady();
-    //void deleteLater();
+    void exit();
     void recieve(QByteArray);
     void send();
 };
 
-void pressButton(QPushButton *&btn, int money);
+void pressButton(QPushButton *&btn, int money, bool flag);
 
 #endif // TINTERFACE_H

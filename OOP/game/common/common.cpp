@@ -2,7 +2,6 @@
 
 const QChar separator(';');
 const int count_box = 15;
-//const int count_clients = 2;
 
 QString& operator<< (QString& m, const QString& s)
 {
