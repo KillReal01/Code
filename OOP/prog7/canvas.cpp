@@ -4,7 +4,7 @@ TCanvas::TCanvas(TGraph graph, QWidget *parent)
     : QWidget(parent)
 {
     this->graph = graph;
-    setFixedSize(400,400);
+    setFixedSize(500, 500);
     this->setStyleSheet("background-color: white;");
 }
 

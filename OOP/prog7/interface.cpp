@@ -6,7 +6,7 @@ TInterface::TInterface(QWidget *parent)
     : QWidget{parent}
 {
     setWindowTitle("Работа №7");
-    setFixedSize(500, 520);
+    setFixedSize(550, 620);
 
     //labels
     choose_file = new QLabel("Выберите файл для загрузки графа", this);
@@ -21,7 +21,7 @@ TInterface::TInterface(QWidget *parent)
     //layoyt
     text = new QWidget(this);
     text->setFixedSize(400, 100);
-    text->move((this->width() - text->width()) / 2, 410);
+    text->move((this->width() - text->width()) / 2, 510);
 
     grid = new QGridLayout(text);
     grid->addWidget(choose_file, 0, 0);

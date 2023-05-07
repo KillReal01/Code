@@ -14,15 +14,13 @@ void TGraph::drawPoints(QPainter *p, QRect r, QColor c)
 {
     qreal cw = 0.5 * r.width();
     qreal ch = 0.5 * r.height();
-    qreal cr = 0.9 * (cw > ch ? ch : cw);
+    qreal cr = 0.8 * (cw > ch ? ch : cw);
     qreal a = 2.0 * acos(-1.0) / count;
     int radius = 19;
 
     p->setPen(QPen(Qt::black, 2, Qt::DotLine));
-    p->drawEllipse(QPoint(int(cw), int(ch)), int(cw) - radius, int(cw) - radius);
+    p->drawEllipse(QPoint(int(cw), int(ch)), int(cr), int(cr));
 
-    p->setPen(QPen(Qt::black));
-    p->setBrush(QBrush(c));
     QFont font;
     font.setPointSize(20);
     p->setFont(QFont(font));
@@ -32,11 +30,21 @@ void TGraph::drawPoints(QPainter *p, QRect r, QColor c)
         int x = cw + cr * sin(i * a);
         int y = ch - cr * cos(i * a);
 
-        int x_1 = cw + (cr - 20) * sin(i * a);
-        int y_1 = ch - (cr - 20) * cos(i * a);
-
-        points.append(QPointF(x_1, y_1));
+        p->setPen(QPen(Qt::black, 2, Qt::SolidLine));
+        p->setBrush(QBrush(Qt::white));
+        int x_loop = cw + (cr + 20) * sin(i * a);
+        int y_loop = ch - (cr + 20) * cos(i * a);
+        if (matrix[i][i] == 1) //петля
+        {
+            p->drawEllipse(QPoint(x_loop, y_loop), int(1.2 * radius), int(1.2 * radius));
+        }
+        p->setPen(QPen(Qt::black, 1, Qt::SolidLine));
+        p->setBrush(QBrush(c));
         p->drawEllipse(QPoint(x, y), radius, radius);
+        int x_link = cw + (cr - 20) * sin(i * a);
+        int y_link = ch - (cr - 20) * cos(i * a);
+        points.append(QPointF(x_link, y_link));
+
         int k = 16;
         p->drawText(QRectF(x - k + 1, y - k, 2 * k, 2 * k),
                     QString().setNum(i + 1),
@@ -46,7 +54,6 @@ void TGraph::drawPoints(QPainter *p, QRect r, QColor c)
 
 void TGraph::drawLinks(QPainter *p)
 {
-    int k = 20;
     p->setPen(QPen(Qt::black, 2, Qt::SolidLine));
     for (int i = 0; i < count; i++) {
         for (int j = 0; j < count; j++) {
@@ -57,7 +64,6 @@ void TGraph::drawLinks(QPainter *p)
         }
     }
 }
-
 
 void TGraph::drawArrowLine(QPainter *painter, const QPointF &p1, const QPointF &p2)
 {
@@ -72,10 +78,11 @@ void TGraph::drawArrowLine(QPainter *painter, const QPointF &p1, const QPointF &
 
 
     // рассчитываем координаты стрелки
-    QPointF arrowP1 = p2 + QPointF(sin(angle - M_PI / 3.0) * 15, cos(angle - M_PI / 3.0) * 15);
+    int k = 3.0;
+    QPointF arrowP1 = p2 + QPointF(sin(angle - M_PI / k) * 15, cos(angle - M_PI / k) * 15);
     QPointF arrowP2 = p2
-                      + QPointF(sin(angle - M_PI + M_PI / 3.0) * 15,
-                                cos(angle - M_PI + M_PI / 3.0) * 15);
+                      + QPointF(sin(angle - M_PI + M_PI / k) * 15,
+                                cos(angle - M_PI + M_PI / k) * 15);
 
     // рисуем стрелку
     QPainterPath path(p2);
